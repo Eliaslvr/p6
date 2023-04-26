@@ -1,16 +1,22 @@
 const express = require('express');
-// const bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-// const cors = require('cors')
-const app = express();
-app.use(express.json());
+const path = require('path');
+const cors = require('cors');
+const helmet = require('helmet')
 
-// const stuffRoutes = require('./routes/stuff')
+
+const app = express();
+app.use(helmet());
+app.use(express.json());
+app.use(cors());
+
+const stuffRoutes = require('./routes/stuff')
 const userRoutes = require('./routes/user');
 const auth = require('./middleware/auth');
 
-mongoose.connect('mongodb+srv://Elias59:Elias591@cluster0.zhu8ine.mongodb.net/?retryWrites=true&w=majority',
-// mongoose.connect('mongodb+srv://Elias59:<password>@cluster0.zhu8ine.mongodb.net/?retryWrites=true&w=majority',
+// mongoose.connect('mongodb+srv://apiDevi:apiDevi_apiDevi@atlascluster.tlro8d0.mongodb.net/?retryWrites=true&w=majority',
+mongoose.connect('mongodb+srv://eliaslelievre792:9mITmulNRtSpKpHc@cluster0.w8ntftc.mongodb.net/?retryWrites=true&w=majority',
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
@@ -29,10 +35,17 @@ app.use((req, res, next) => {
 // app.use((req, res) => {
 //   res.json({ message: 'sdlcnodnco'}); 
 // });
-// app.use(bodyParser.json());
+
+app.use('/api/sauces', (req, res, next) => {
+  let sauces = "./models/Thing.js";
+  res.status(200).json(sauces);
+});
+
+app.use(bodyParser.json());
 // app.use(cors())
  
-//app.use('/api/stuff', stuffRoutes);
+app.use('/api/sauces', stuffRoutes);
 app.use('/api/auth', userRoutes);
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 module.exports = app;
