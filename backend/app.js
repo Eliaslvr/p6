@@ -3,17 +3,19 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const path = require('path');
 const cors = require('cors');
-const helmet = require('helmet')
+const helmet = require('helmet');
 
 
 const app = express();
+const router = express.Router();
 app.use(helmet());
 app.use(express.json());
 app.use(cors());
 
-const stuffRoutes = require('./routes/stuff')
+const saucesRoutes = require('./routes/sauces')
 const userRoutes = require('./routes/user');
 const auth = require('./middleware/auth');
+const Thing = require('../backend/models/Thing');
 
 // mongoose.connect('mongodb+srv://apiDevi:apiDevi_apiDevi@atlascluster.tlro8d0.mongodb.net/?retryWrites=true&w=majority',
 mongoose.connect('mongodb+srv://eliaslelievre792:9mITmulNRtSpKpHc@cluster0.w8ntftc.mongodb.net/?retryWrites=true&w=majority',
@@ -29,23 +31,26 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     next();
   });
-// app.use((req, res) => {
-//   res.json(auth); 
-// });
-// app.use((req, res) => {
-//   res.json({ message: 'sdlcnodnco'}); 
-// });
 
-app.use('/api/sauces', (req, res, next) => {
-  let sauces = "./models/Thing.js";
-  res.status(200).json(sauces);
+app.get('/api/sauces/:id', (req, res, next) => {
+  Thing.findOne({ _id: req.params.id })
+    .then(thing => res.status(200).json(thing))
+    .catch(error => res.status(404).json({ error }));
 });
 
-app.use(bodyParser.json());
-// app.use(cors())
- 
-app.use('/api/sauces', stuffRoutes);
+app.get('/api/sauces', (req, res, next) => {
+  Thing.find()
+    .then(things => res.status(200).json(things))
+    .catch(error => res.status(400).json({ error }));
+});
+
+
+// app.use(bodyParser.json());
+app.use(cors())
+
+app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
+app.use('/api/sauces', saucesRoutes);
 app.use('/api/auth', userRoutes);
-app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use('/images', express.static(path.join(__dirname, "images")));
 
 module.exports = app;
