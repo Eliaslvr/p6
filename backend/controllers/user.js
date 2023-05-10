@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt');//utilise un algorithme unidirectionnel pour chiffrer et créer un hash des mots de passe utilisateur
 const jwt = require('jsonwebtoken');//jsonwebtoken sert à chiffrer un nouveau token
 
 const User = require('../models/User');

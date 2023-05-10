@@ -1,23 +1,21 @@
 const express = require('express');
-const bodyParser = require('body-parser');
+// const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const path = require('path');
-const cors = require('cors');
-const helmet = require('helmet');
+const path = require('path');//Le module Path permet de travailler avec des répertoires et des chemins de fichiers.
+const cors = require('cors'); 
+const helmet = require('helmet');//bibliothèque JavaScript qui aide à sécuriser Node.js en définissant plusieurs en-têtes HTTP. Il agit comme un middleware pour Express et les technologies similaires, ajoutant ou supprimant automatiquement des en-têtes HTTP pour se conformer aux normes de sécurité Web
 
-
-const app = express();
-const router = express.Router();
+const app = express();//app qui sera notre application; ça permet de créer une application express
+// const router = express.Router();
 app.use(helmet());
 app.use(express.json());
 app.use(cors());
 
 const saucesRoutes = require('./routes/sauces')
 const userRoutes = require('./routes/user');
-const auth = require('./middleware/auth');
+// const auth = require('./middleware/auth');
 const Thing = require('../backend/models/Thing');
 
-// mongoose.connect('mongodb+srv://apiDevi:apiDevi_apiDevi@atlascluster.tlro8d0.mongodb.net/?retryWrites=true&w=majority',
 mongoose.connect('mongodb+srv://eliaslelievre792:9mITmulNRtSpKpHc@cluster0.w8ntftc.mongodb.net/?retryWrites=true&w=majority',
   { useNewUrlParser: true,
     useUnifiedTopology: true })
@@ -33,7 +31,7 @@ app.use((req, res, next) => {
   });
 
 app.get('/api/sauces/:id', (req, res, next) => {
-  Thing.findOne({ _id: req.params.id })
+  Thing.findOne({ _id: req.params.id })//findOne() retourne un seul Thing basé sur la fonction de comparaison qu'on lui passe
     .then(thing => res.status(200).json(thing))
     .catch(error => res.status(404).json({ error }));
 });

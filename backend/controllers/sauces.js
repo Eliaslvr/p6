@@ -1,5 +1,5 @@
 const Thing = require('../models/Thing');
-const fs = require('fs');
+// const fs = require('fs');
 
 exports.createThing = (req, res, next) => {
     const thingObject = JSON.parse(req.body.thing);
@@ -10,10 +10,6 @@ exports.createThing = (req, res, next) => {
         ...thingObject,
         userId: req.auth.userId,
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
-        // likes: 0,
-        // dislikes: 0,
-        // usersLiked: [],
-        // usersDisliked: [],
     });
   
     thing.save()
@@ -73,34 +69,35 @@ exports.getAllStuff = (req, res, next) => {//récupère toutes les choses, mais 
 };
 
 exports.likeSauce = (req, res, next) => {
-    Thing.findOne({_id : req.params.id})
-        .then((objet) => {
-            // if(!objet.usersLiked.includes(req.body.userId) && req.body.like === 1) {
-            // } 
-            Thing.updateOne(
-            {_id : req.params.id},
-            {
-                $inc: {likes: 1},
-                $push: {usersLiked: req.body.userId}
-            }
-            )
-            // .then(() => res.status(201).json({ message: "Thing like +1"}))
-            // .catch((error) => res.status(404).json({error}))
-
-            // if(objet.usersLiked.includes(req.body.userId) && req.body.like === 1) {
-            // } 
-
-            Thing.updateOne(
-            {_id : req.params.id},
-            {
-                $inc: {likes: -1},
-                $pull: {usersLiked: req.body.userId}
-            }
-            )
-            .then(() => res.status(201).json({ message: "Thing like 0"}))
-            .catch((error) => res.status(404).json({error}))
-
-            
-        })
-        .catch((error) => res.status(404).json({error}));
-}
+    const like = req.body.like;
+    const userId = req.body.userId;
+    const sauceId = req.params.id;
+  
+    // Vérifiez si l'utilisateur a déjà aimé ou pas aimé la sauce
+    Thing.findOne({ _id: sauceId })
+      .then((sauce) => {
+        if (like === 1 && !sauce.usersLiked.includes(userId)) {
+          // Ajouter un like à la sauce et mettre à jour les utilisateurs qui ont aimé la sauce
+          sauce.likes += 1;
+          sauce.usersLiked.push(userId);
+        } else if (like === -1 && !sauce.usersDisliked.includes(userId)) {
+          // Ajouter un dislike à la sauce et mettre à jour les utilisateurs qui n'ont pas aimé la sauce
+          sauce.dislikes += 1;
+          sauce.usersDisliked.push(userId);
+        } else if (like === 0) {
+          // Enlever le like ou le dislike de l'utilisateur et mettre à jour la sauce en conséquence
+          if (sauce.usersLiked.includes(userId)) {
+            sauce.likes -= 1;
+            sauce.usersLiked = sauce.usersLiked.filter(id => id !== userId);
+          } else if (sauce.usersDisliked.includes(userId)) {
+            sauce.dislikes -= 1;
+            sauce.usersDisliked = sauce.usersDisliked.filter(id => id !== userId);
+          }
+        }
+        // Enregistrer les modifications de la sauce dans la base de données
+        Thing.updateOne({ _id: sauceId }, sauce)
+          .then(() => res.status(200).json({ message: 'Sauce likée avec succès !' }))
+          .catch(error => res.status(400).json({ error }));
+      })
+      .catch(error => res.status(500).json({ error }));
+};

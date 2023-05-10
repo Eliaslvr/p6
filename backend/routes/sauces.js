@@ -1,5 +1,5 @@
 const express = require('express');
-const router = express.Router();
+const router = express.Router();//Le système de routage express est utile pour gérer la structure de votre application, en regroupant différentes routes dans un seul dossier/répertoire
 
 const auth = require('../middleware/auth');
 const multer = require('../middleware/multer-config')

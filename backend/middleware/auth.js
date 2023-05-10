@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');//jsonwebtoken sert à chiffrer un nouveau token
  
 module.exports = (req, res, next) => {
    try {
